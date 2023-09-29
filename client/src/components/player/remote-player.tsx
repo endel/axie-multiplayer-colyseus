@@ -9,19 +9,13 @@ import {
 } from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
 
+import type { Player } from "../../../../server/src/rooms/schema/MyRoomState";
+
 interface RemotePlayerProps {
-  position: { x: number; y: number; z: number };
-  rotation: { x: number; y: number; z: number };
-  animation: string;
-  axie: AxieStarter;
+  player: Player
 }
 
-export default function RemotePlayer({
-  position,
-  rotation,
-  animation,
-  axie,
-}: RemotePlayerProps) {
+export default function RemotePlayer({ player }: RemotePlayerProps) {
   const playerRef = useRef<THREE.Group | null>(null);
   const physicRef = useRef<RapierRigidBody>(null);
   const translation = useRef<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
@@ -29,13 +23,13 @@ export default function RemotePlayer({
   useFrame(() => {
     if (!playerRef.current) return;
     if (!physicRef.current) return;
-    if (!position) return;
+    if (!player) return;
 
-    translation.current.set(position.x, position.y, position.z);
+    translation.current.set(player.position.x, player.position.y, player.position.z);
     physicRef.current.setTranslation(translation.current, true);
 
     playerRef.current.position.lerp(translation.current, 0.3);
-    playerRef.current.rotation.set(rotation.x, rotation.y, rotation.z);
+    playerRef.current.rotation.set(player.rotation.x, player.rotation.y, player.rotation.z);
   });
 
   return (
@@ -50,7 +44,7 @@ export default function RemotePlayer({
         <CapsuleCollider args={[0.1, 0.2]} />
       </RigidBody>
       <group ref={playerRef}>
-        <Axie position={[0, -0.3, 0]} name={axie} animation={animation} />
+        <Axie position={[0, -0.3, 0]} name={player.skin as AxieStarter} animation={player.animation} />
       </group>
     </group>
   );

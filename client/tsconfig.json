@@ -24,11 +24,13 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
 
+    /* why this doesn't seem to be working? */
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     }
 
   },
-  "include": ["src"],
+  "include": ["./src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

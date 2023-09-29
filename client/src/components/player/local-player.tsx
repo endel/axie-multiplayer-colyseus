@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import Axie from "./axie";
 import * as THREE from "three";
-import {
-  CapsuleCollider,
-  RapierRigidBody,
-  RigidBody,
-} from "@react-three/rapier";
+import { CapsuleCollider, RapierRigidBody, RigidBody, } from "@react-three/rapier";
 import { useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { myPlayer } from "playroomkit";
+import { useColyseusRoom, useColyseusState } from "../../net";
+import { AxieStarter } from "@sms0nhaaa/r3f-axie-starter";
+import Axie from "./axie";
+
+import { MessageType } from "../../../../server/src/rooms/schema/MyRoomState";
 
 const SPEED = 1.5;
 const JUMP_HEIGHT = 2;
@@ -27,7 +26,11 @@ export default function LocalPlayer({ position }: LocalPlayerProps) {
   const physicRef = useRef<RapierRigidBody>(null);
   const [animation, setAnimation] = useState("idle");
   const frames = useRef(0);
-  const me = myPlayer();
+
+  const room = useColyseusRoom();
+
+  // @ts-ignore
+  const player = useColyseusState((state) => state.players.get(room.sessionId))
 
   const up = useKeyboardControls((state) => state.up);
   const down = useKeyboardControls((state) => state.down);
@@ -39,12 +42,8 @@ export default function LocalPlayer({ position }: LocalPlayerProps) {
     const animation = up || down || left || right ? "walk" : "idle";
 
     setAnimation(animation);
-    me.setState("animation", animation);
+    room.send(MessageType.ANIMATION, animation);
   }, [up, down, left, right]);
-
-  useEffect(() => {
-    me.setState("axie", "buba");
-  }, []);
 
   useFrame(({ camera }) => {
     frames.current += 1;
@@ -98,25 +97,14 @@ export default function LocalPlayer({ position }: LocalPlayerProps) {
     playerRef.current.position.set(translate.x, translate.y, translate.z);
 
     if (frames.current % OFFSET === 0) {
-      me.setState(
-        "position",
-        {
-          x: translate.x,
-          y: translate.y,
-          z: translate.z,
-        },
-        false,
-      );
-      me.setState(
-        "rotation",
-        {
-          x: playerRef.current.rotation.x,
-          y: playerRef.current.rotation.y,
-          z: playerRef.current.rotation.z,
-        },
-        false,
-      );
-
+      room.send(MessageType.MOVE, [
+          translate.x,
+          translate.y,
+          translate.z,
+          playerRef.current.rotation.x,
+          playerRef.current.rotation.y,
+          playerRef.current.rotation.z,
+      ]);
       frames.current = 0;
     }
 
@@ -139,7 +127,7 @@ export default function LocalPlayer({ position }: LocalPlayerProps) {
       <group ref={playerRef}>
         <Axie
           position={[0, -0.3, 0]}
-          name={me.getState("axie")}
+          name={player.skin as AxieStarter}
           animation={animation}
         />
       </group>

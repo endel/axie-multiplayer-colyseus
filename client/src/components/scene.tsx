@@ -1,5 +1,4 @@
 import { Canvas } from "@react-three/fiber";
-import { Buba } from "@sms0nhaaa/r3f-axie-starter";
 import Floor from "./floor";
 import { Physics } from "@react-three/rapier";
 import { KeyboardControls, OrbitControls } from "@react-three/drei";
