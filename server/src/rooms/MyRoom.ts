@@ -24,6 +24,24 @@ export class MyRoom extends Room<MyRoomState> {
         player.rotation.z = payload[5];
       }
     });
+
+    this.onMessage(MessageType.CHANGE_SKIN, (client, payload) => {
+      const player = this.state.players.get(client.sessionId);
+
+      // validate input
+      if (player && SKINS.includes(payload)) {
+        player.skin = payload;
+      }
+    });
+
+    this.onMessage(MessageType.ANIMATION, (client, payload) => {
+      const player = this.state.players.get(client.sessionId);
+
+      // validate input
+      if (player) {
+        player.animation = payload;
+      }
+    });
   }
 
   onJoin (client: Client, options: any) {

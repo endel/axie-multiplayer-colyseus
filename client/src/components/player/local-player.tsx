@@ -41,6 +41,8 @@ export default function LocalPlayer({ position }: LocalPlayerProps) {
   useEffect(() => {
     const animation = up || down || left || right ? "walk" : "idle";
 
+    console.log({ animation });
+
     setAnimation(animation);
     room.send(MessageType.ANIMATION, animation);
   }, [up, down, left, right]);

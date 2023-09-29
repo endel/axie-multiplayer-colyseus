@@ -25,12 +25,16 @@ export default function RemotePlayer({ player }: RemotePlayerProps) {
     if (!physicRef.current) return;
     if (!player) return;
 
+    // TODO: improve lerp/animation
+
     translation.current.set(player.position.x, player.position.y, player.position.z);
     physicRef.current.setTranslation(translation.current, true);
 
     playerRef.current.position.lerp(translation.current, 0.3);
     playerRef.current.rotation.set(player.rotation.x, player.rotation.y, player.rotation.z);
   });
+
+  console.log("REMOTE PLAYER, animation => ", player.animation);
 
   return (
     <group name="remote-player">
@@ -44,7 +48,12 @@ export default function RemotePlayer({ player }: RemotePlayerProps) {
         <CapsuleCollider args={[0.1, 0.2]} />
       </RigidBody>
       <group ref={playerRef}>
+
+        {/*
+          * TODO: "animation" is not being updated
+          */}
         <Axie position={[0, -0.3, 0]} name={player.skin as AxieStarter} animation={player.animation} />
+
       </group>
     </group>
   );

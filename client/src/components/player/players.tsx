@@ -11,6 +11,9 @@ import type { MapSchema } from "@colyseus/schema";
 export default function Players() {
   const room = useColyseusRoom();
 
+  //
+  // TODO: adding/removing players doesn't seem to be triggering here
+  //
   const players: MapSchema<Player> =
     // @ts-ignore
     useColyseusState((state) => state.players);
